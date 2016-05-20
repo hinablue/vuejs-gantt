@@ -48,7 +48,9 @@ export default {
     }
   },
   attached () {
-    this.setHeaderHeight(this.$el.offsetHeight)
+    this.$nextTick(() => {
+      this.setHeaderHeight(this.$el.offsetHeight)
+    })
   }
 };
 </script>
