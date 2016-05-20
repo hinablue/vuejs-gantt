@@ -1,6 +1,6 @@
-# contest-vue
+# VueGantt
 
-> A Contest App for Vue.js
+> A Gantt App for Vue.js
 
 ## Build Setup
 
