@@ -51,55 +51,25 @@ export default {
       {
         childrenCollection = childrenCollection.concat(data.children)
         data.children.forEach((child) => {
-          rowDatetimeRange = {
-            from: '',
-            to: ''
-          }
-
           let __index = this.data.findIndex((d) => {
             return d.id === child
           })
           if (__index > -1) {
             if (treeData.id === this.data[__index].id) {
-              if (this.data[__index].tasks
-                && this.data[__index].tasks.length > 0)
-              {
-                rowDatetimeRange = getRowDateRange(this.data[__index].tasks)
-              }
               treeData = Object.assign({}, {
                 id: data.id,
                 name: data.name,
-                from: rowDatetimeRange.from,
-                to: rowDatetimeRange.to,
                 children: [treeData]
               })
             } else {
-              if (data.tasks
-                && data.tasks.length > 0)
-              {
-                rowDatetimeRange = getRowDateRange(data.tasks)
-              }
               treeData = Object.assign({}, treeData, {
                 id: data.id,
-                name: data.name,
-                from: rowDatetimeRange.from,
-                to: rowDatetimeRange.to
+                name: data.name
               })
 
-              rowDatetimeRange = {
-                from: '',
-                to: ''
-              }
-              if (this.data[__index].tasks
-                && this.data[__index].tasks.length > 0)
-              {
-                rowDatetimeRange = getRowDateRange(this.data[__index].tasks)
-              }
               treeData.children.push({
                 id: this.data[__index].id,
                 name: this.data[__index].name,
-                from: rowDatetimeRange.from,
-                to: rowDatetimeRange.to,
                 children: []
               })
             }
@@ -108,25 +78,18 @@ export default {
       }
     });
 
-    treeData = [treeData];
+    if (treeData.length > 0) {
+      treeData = [treeData];
+    } else {
+      treeData = [];
+    }
 
     this.data.forEach((data) => {
       if (childrenCollection.indexOf(data.id) === -1
         && data.children.length === 0) {
-        rowDatetimeRange = {
-          from: '',
-          to: ''
-        }
-        if (data.tasks
-          && data.tasks.length > 0)
-        {
-          rowDatetimeRange = getRowDateRange(data.tasks)
-        }
         treeData.push({
           id: data.id,
           name: data.name,
-          from: rowDatetimeRange.from,
-          to: rowDatetimeRange.to,
           children: []
         })
       }

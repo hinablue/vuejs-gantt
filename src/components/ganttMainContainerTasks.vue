@@ -44,7 +44,7 @@ export default {
           this.rows.push(Object.assign({}, row, {
             display: true,
             tasks: this.data[__index].tasks.map((task) => {
-              this.startFrom = moment.min(this.startFrom, task.from.clone())
+              this.startFrom = moment.min(this.startFrom, task.from.clone().startOf('day'))
               return Object.assign({}, task, {
                 color: task.color ? task.color : 'rgb(255, 150, 95)'
               })
@@ -74,13 +74,13 @@ export default {
     },
     getPositionFromDate (date) {
       return Math.round(
-        (date.format('X') - this.startFrom.format('X')) / 3600 * (2 * 16 / 60)
+        (date.format('X') - this.startFrom.format('X')) / 3600 * (2 * 16 / 24)
       )
     },
     getWidthFromDate (from, to) {
       return Math.round(
         Math.abs(
-          Math.round((from.format('X') - to.format('X')) / 3600) * (2 * 16 / 60)
+          Math.ceil((from.format('X') - to.format('X')) / 3600) * (2 * 16 / 24)
         )
       )
     }
@@ -88,7 +88,8 @@ export default {
   data () {
     return {
       startFrom: moment().add(9999, 'year'),
-      rows: []
+      rows: [],
+      loggedEvent: ''
     };
   },
   watch: {
