@@ -1,20 +1,22 @@
 <template>
   <div class="tree-item-folder">
-    <div class="tree-item">
-      <span v-if="isFolder">
-        <i class="glyphicon glyphicon-chevron-down"
-          @click="toggle(model)"
-          v-if="open"></i>
-        <i class="glyphicon glyphicon-chevron-right"
-          @click="toggle(model)"
-          v-else="!open"></i>
-      </span>
-      <span v-else>
-        <i class="glyphicon glyphicon-minus"
-          v-if="!open"></i>
-      </span>
+    <div class="tree-item" v-if="isFolder">
+      <i class="glyphicon glyphicon-chevron-down"
+        @click="toggle(model)"
+        v-if="open"></i>
+      <i class="glyphicon glyphicon-chevron-right"
+        @click="toggle(model)"
+        v-else="!open"></i>
       <span class="tree-item-model-name"
-        @click="toggleRow">{{ model.name }}</span>
+        @click="toggleRow">{{ model.name }}
+      </span>
+    </div>
+    <div class="tree-item" v-else>
+      <i class="glyphicon glyphicon-minus"
+        v-if="!open"></i>
+      <span class="tree-item-model-name"
+        @click="toggleRow">{{ model.name }}
+      </span>
     </div>
     <gantt-side-table-tree-item
       class="tree-item-folder"
@@ -77,20 +79,22 @@ export default {
   justify-content: flex-start;
   align-content: center;
   position: relative;
+  vertical-align: middle;
   height: 2rem;
   &::after {
     position: absolute;
     bottom: 0;
-    left: -10rem;
+    left: -99rem;
     right: 0;
     content: "";
     display: block;
     height: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.34);
   }
-  .material-icons {
+  .glyphicon {
     flex: 0 1 auto;
     cursor: pointer;
+    margin-right: 0.16rem;
   }
   .tree-item-model-name {
     flex: 0 1 auto;
