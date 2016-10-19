@@ -13,3 +13,7 @@ export const getTableTree = state => {
 export const getToggledTableTreeRow = state => {
   return state.utility.toggleTableTreeRow
 }
+
+export const getTableTreeWidth = state => {
+  return state.utility.tableTreeNameWidth
+}

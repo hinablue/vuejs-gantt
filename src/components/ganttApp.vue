@@ -1,24 +1,21 @@
 <template>
   <section id="vueGanttApp">
     <gantt-side
-      :style="sideStyles"
-      :size.sync="sideSize"
-      :resizer.sync="resizer"></gantt-side>
+      v-bind:style="sideStyles"></gantt-side>
     <gantt-main
-      :style="mainStyles"></gantt-main>
+      v-bind:style="mainStyles"></gantt-main>
   </section>
 </template>
 
 <script>
-import moment from 'moment'
-import ganttMain from './ganttMain'
-import ganttSide from './ganttSide'
-import { fetchGanttData } from '../vuex/actions'
+import { mapActions, mapGetters } from 'vuex'
+import ganttMain from './ganttMain.vue'
+import ganttSide from './ganttSide.vue'
 
-// let startTestTask;
+// let startTestTask
 // setTimeout(() => {
 //   for (var j = 1; j < 6; j++) {
-//     startTestTask = moment('2016-01-02 00:00:00');
+//     startTestTask = moment('2016-01-02 00:00:00')
 //     for (var i = 1; i < 200; i++) {
 //       startTestTask = startTestTask.clone().add(2, 'day')
 //       data[j].tasks.push({
@@ -32,18 +29,20 @@ import { fetchGanttData } from '../vuex/actions'
 // }, 500)
 
 export default {
-  vuex: {
-    actions: {
-      fetchGanttData
-    }
-  },
+  methods: mapActions({
+    fetchGanttData: 'fetchGanttData',
+    setTableTreeWidth: 'setTableTreeWidth'
+  }),
   components: {
-    ganttSide,
-    ganttMain
+    'gantt-main': ganttMain,
+    'gantt-side': ganttSide
   },
   created () {
     this.fetchGanttData()
   },
+  computed: mapGetters({
+    getTableTreeWidth: 'getTableTreeWidth'
+  }),
   data () {
     return {
       sideStyles: {
@@ -52,17 +51,14 @@ export default {
       mainStyles: {
         flex: '1 1 70%'
       },
-      sideSize: 500,
       offsetWidth: 0,
       resizer: {
         enable: true
       }
-    };
-  },
-  attached () {
+    }
   },
   watch: {
-    sideSize (newSize, oldSize) {
+    getTableTreeWidth (newSize, oldSize) {
       if (newSize !== oldSize) {
         this.sideStyles.flex = '1 1 ' + (newSize / this.$el.offsetWidth) * 100 + '%'
         this.mainStyles.flex = '1 1 ' + (1 - newSize / this.$el.offsetWidth) * 100 + '%'
@@ -73,20 +69,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../node_modules/material-design-lite/material.min.css';
-
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url(../assets/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
-  src: local('Material Icons'),
-       local('MaterialIcons-Regular'),
-       url(../assets/fonts/MaterialIcons-Regular.woff2) format('woff2'),
-       url(../assets/fonts/MaterialIcons-Regular.woff) format('woff'),
-       url(../assets/fonts/MaterialIcons-Regular.ttf) format('truetype');
-}
-
 * {
   box-sizing: border-box;
 }

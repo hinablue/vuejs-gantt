@@ -2,47 +2,37 @@
   <div class="gantt-side">
     <gantt-side-header></gantt-side-header>
     <gantt-side-table-tree></gantt-side-table-tree>
-    <gantt-side-resizer :size.sync="size" v-if="resizer.enable"></gantt-side-resizer>
+    <gantt-side-resizer></gantt-side-resizer>
   </div>
 </template>
 
 <script>
-import ganttSideHeader from './ganttSideHeader'
-import ganttSideTableTree from './ganttSideTableTree'
-import ganttSideResizer from './ganttSideResizer'
+import { mapActions, mapGetters } from 'vuex'
+import ganttSideHeader from './ganttSideHeader.vue'
+import ganttSideTableTree from './ganttSideTableTree.vue'
+import ganttSideResizer from './ganttSideResizer.vue'
 
 export default {
   name: 'ganttSide',
   components: {
-    ganttSideHeader,
-    ganttSideTableTree,
-    ganttSideResizer
+    'gantt-side-header': ganttSideHeader,
+    'gantt-side-table-tree': ganttSideTableTree,
+    'gantt-side-resizer': ganttSideResizer
   },
   mixins: [
-    require ('vue-mixins/onWindowResize')
+    require('vue-mixins/onWindowResize')
   ],
-  props: {
-    resizer: {
-      type: Object,
-      default: {
-        enable: true
-      }
-    },
-    size: {
-      type: Number,
-      default: 200
-    }
-  },
-  compiled () {
+  computed: mapGetters({
+    getTableTreeWidth: 'getTableTreeWidth'
+  }),
+  methods: mapActions({
+    setTableTreeWidth: 'setTableTreeWidth'
+  }),
+  mounted () {
     this.onWindowResize((e) => {
-      this.size = this.$el.offsetWidth
+      this.setTableTreeWidth(this.$el.offsetWidth)
       e.preventDefault()
       return true
-    })
-  },
-  attached () {
-    this.$nextTick(() => {
-      this.size = this.$el.offsetWidth
     })
   }
 }

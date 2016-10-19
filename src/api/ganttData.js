@@ -1,4 +1,6 @@
-import moment from 'moment'
+import { parse } from 'date-fns'
+
+/* eslint-disable */
 const _ganttData = [
     {
         "id": "573eeaad67797",
@@ -6078,24 +6080,41 @@ const _ganttData = [
     }
 ]
 
+
 export default {
   getData (callback) {
     let ganttData = _ganttData.map((row) => {
-      if (row.tasks
-        && row.tasks.length > 0)
-      {
+      if (row.tasks &&
+        row.tasks.length > 0
+      ) {
         row.tasks = row.tasks.map((task) => {
           if (typeof task.from === 'string') {
-            task.from = moment(task.from)
+            task.from = parse(task.from)
           }
           if (typeof task.to === 'string') {
-            task.to = moment(task.to)
+            task.to = parse(task.to)
           }
           return task
         })
       }
       return row
     })
+    // ganttData = ganttData.map((row) => {
+    //   let children = []
+    //   if (typeof row.children !== 'undefined' &&
+    //     row.children.length > 0
+    //   ) {
+    //     row.children.forEach((child) => {
+    //       let mappingRow = ganttData.findIndex((row) => {
+    //         return row.id === child
+    //       })
+    //       if (mappingRow > -1) {
+    //         children.push(Object.assign({}, ganttData[mappingRow]))
+    //       }
+    //     })
+    //   }
+    //   return Object.assign({}, row, { children: children })
+    // })
     callback(ganttData)
   },
   addTask (task) {

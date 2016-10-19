@@ -1,28 +1,20 @@
 <template>
   <div class="gantt-side-resizer"
     v-bind:style="styles"
-    @mousedown="dragStart | notPrevented | prevent"
-    @touchstart="dragStart | notPrevented | prevent"
-    @dblclick="dragStart | notPrevented | prevent">
+    @mousedown.prevent="dragStart"
+    @touchstart.prevent="dragStart"
+    @dblclick.prevent="dragStart">
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'ganttSideResizer',
-  filters: {
-    notPrevented: require ('vue-filters/notPrevented'),
-    prevent: require ('vue-filters/prevent')
-  },
   mixins: [
-    require ('vue-mixins/onceDocument'),
-    require ('vue-mixins/onDocument')
+    require('vue-mixins/onceDocument'),
+    require('vue-mixins/onDocument')
   ],
-  props: {
-    size: {
-      type: Number
-    }
-  },
   data () {
     return {
       startPos: 0,
@@ -30,50 +22,60 @@ export default {
       minSize: 200,
       removeMoveListener: null,
       removeEndListener: null,
+      width: this.getTableTreeWidth,
       styles: {
         left: '0px'
       }
-    };
-  },
-  methods: {
-    dragStart (e) {
-      this.startSize = this.size;
-      this.startPos = e.clientX;
-
-      this.removeMoveListener = this.onDocument(
-        'mousemove',
-        this.drag
-      );
-      this.removeEndListener = this.onceDocument(
-        'mouseup',
-        this.dragEnd
-      );
-    },
-    drag (e) {
-      this.size = this.startSize + (e.clientX - this.startPos);
-      e.preventDefault();
-    },
-    dragEnd (e) {
-      this.removeMoveListener();
-      this.removeEndListener();
-      e.preventDefault();
-      return true;
-    },
-    setStyle () {
-      this.styles.left = (this.size - this.$el.offsetWidth) + 'px';
     }
   },
-  watch: {
-    size (newSize, oldSize) {
-      if (newSize !== oldSize
-        && newSize >= this.minSize) {
-        this.size = newSize;
-        this.setStyle();
-      } else {
-        this.size = this.minSize + 1;
-        this.removeMoveListener();
-        this.removeEndListener();
+  computed: mapGetters({
+    getTableTreeWidth: 'getTableTreeWidth'
+  }),
+  methods: Object.assign(
+    mapActions({
+      setTableTreeWidth: 'setTableTreeWidth'
+    }),
+    {
+      dragStart (e) {
+        this.startSize = this.getTableTreeWidth
+        this.startPos = e.clientX
+
+        this.removeMoveListener = this.onDocument(
+          'mousemove',
+          this.drag
+        )
+        this.removeEndListener = this.onceDocument(
+          'mouseup',
+          this.dragEnd
+        )
+      },
+      drag (e) {
+        this.width = this.startSize + (e.clientX - this.startPos)
+        this.styles.left = (this.width - this.$el.offsetWidth) + 'px'
+        e.preventDefault()
+      },
+      dragEnd (e) {
+        this.removeMoveListener()
+        this.removeEndListener()
+        this.setTableTreeWidth(this.width)
+        e.preventDefault()
+        return true
+      },
+      setStyle () {
+        this.styles.left = (this.width - this.$el.offsetWidth) + 'px'
       }
+    }
+  ),
+  mounted () {
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.styles.left = (this.getTableTreeWidth - this.$el.offsetWidth) + 'px'
+      }, 10)
+    })
+  },
+  watch: {
+    getTableTreeWidth (width) {
+      this.styles.left = (width - this.$el.offsetWidth) + 'px'
     }
   }
 }

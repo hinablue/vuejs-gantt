@@ -8,16 +8,16 @@
 </template>
 
 <script>
-import ganttMainContainerRows from './ganttMainContainerRows'
-import ganttMainContainerColumns from './ganttMainContainerColumns'
-import ganttMainContainerTasks from './ganttMainContainerTasks'
+import ganttMainContainerColumns from './ganttMainContainerColumns.vue'
+import ganttMainContainerRows from './ganttMainContainerRows.vue'
+import ganttMainContainerTasks from './ganttMainContainerTasks.vue'
 
 export default {
   name: 'ganttMainContainer',
   components: {
-    ganttMainContainerRows,
-    ganttMainContainerColumns,
-    ganttMainContainerTasks
+    'gantt-main-container-columns': ganttMainContainerColumns,
+    'gantt-main-container-rows': ganttMainContainerRows,
+    'gantt-main-container-tasks': ganttMainContainerTasks
   },
   props: {
     yearDays: {
@@ -25,7 +25,7 @@ export default {
     }
   },
   data () {
-    return {};
+    return {}
   }
 }
 </script>

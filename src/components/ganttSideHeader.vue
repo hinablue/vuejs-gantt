@@ -1,19 +1,14 @@
 <template>
-  <div class="gantt-side-header" :style="headerStyle">
+  <div class="gantt-side-header" v-bind:style="headerStyle">
     <div class="head name">{{ rowName }}</div>
   </div>
 </template>
 
 <script>
-import { getHeaderHeight } from '../vuex/getters'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'ganttSideHeader',
-  vuex: {
-    getters: {
-      headerHeight: getHeaderHeight
-    }
-  },
   data () {
     return {
       headerStyle: {
@@ -21,14 +16,25 @@ export default {
       }
     }
   },
-  computed: {
-    rowName () {
-      return 'Name'
+  computed: Object.assign(
+    mapGetters({
+      headerHeight: 'getHeaderHeight'
+    }),
+    {
+      rowName () {
+        return 'Name'
+      }
     }
-  },
-  attached () {
+  ),
+  methods: mapActions({
+    setTableTreeWidth: 'setTableTreeWidth'
+  }),
+  mounted () {
     this.$nextTick(() => {
-      this.headerStyle.height = this.headerHeight + 'px'
+      setTimeout(() => {
+        this.headerStyle.height = this.headerHeight + 'px'
+        this.setTableTreeWidth(this.$el.offsetWidth)
+      }, 10)
     })
   }
 }

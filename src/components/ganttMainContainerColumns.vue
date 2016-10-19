@@ -6,19 +6,14 @@
 </template>
 
 <script>
-import {
-  getGanttData,
-  getToggledTableTreeRow
-} from '../vuex/getters'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ganttMainContainerColumns',
-  vuex: {
-    getters: {
-      data: getGanttData,
-      toggleRow: getToggledTableTreeRow
-    }
-  },
+  computed: mapGetters({
+    ganttData: 'getGanttData',
+    toggleRow: 'getToggledTableTreeRow'
+  }),
   props: {
     yearDays: {
       type: Array

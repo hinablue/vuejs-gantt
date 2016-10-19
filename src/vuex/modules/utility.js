@@ -10,7 +10,8 @@ const state = {
   data: [],
   tableTree: {},
   toggleTableTreeRow: {},
-  headerHeight: 0
+  headerHeight: 0,
+  tableTreeNameWidth: 0
 }
 
 const mutations = {
@@ -28,6 +29,10 @@ const mutations = {
 
   [TOGGLE_TABLE_TREE_ROW] (state, data) {
     state.toggleTableTreeRow = data
+  },
+
+  [SET_TABLE_TREE_NAME_WIDTH] (state, data) {
+    state.tableTreeNameWidth = data
   }
 }
 

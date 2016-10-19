@@ -3,33 +3,31 @@
     <section class="date-header">
       <div class="date year"
         :style="yearMonthStyle(year)"
-        v-for="year in yearMonth"
-        track-by="$index">{{ year.format('MMM YYYY') }}</div>
+        v-for="(year, index) in yearMonth">
+        <span>{{ computedYear(year) }}</span>
+      </div>
     </section>
     <section class="date-header">
       <div class="date week"
-        v-for="week in yearWeeks"
-        track-by="$index">{{ week }}</div>
+        v-for="(week, index) in yearWeeks">
+        <span>{{ week }}</span>
+      </div>
     </section>
     <section class="date-header">
       <div class="date day"
-        v-for="day in yearDays"
-        track-by="$index">{{ day }}</div>
+        v-for="(day, index) in yearDays">
+        <span>{{ day }}</span>
+      </div>
     </section>
   </section>
 </template>
 
 <script>
-import moment from 'moment'
-import { setHeaderHeight } from '../vuex/actions'
+import { mapActions } from 'vuex'
+import { format, endOfMonth } from 'date-fns'
 
 export default {
   name: 'ganttMainHeader',
-  vuex: {
-    actions: {
-      setHeaderHeight
-    }
-  },
   props: {
     yearMonth: {
       type: Array
@@ -41,18 +39,26 @@ export default {
       type: Array
     }
   },
-  methods: {
-    yearMonthStyle (date) {
-      let __date = parseInt(date.endOf('month').format('D'), 10);
-      return { width: __date * 2 + 'rem' };
+  methods: Object.assign(
+    mapActions({
+      setHeaderHeight: 'setHeaderHeight'
+    }),
+    {
+      yearMonthStyle (date) {
+        let __date = parseInt(format(endOfMonth(date), 'D'), 10)
+        return { width: __date * 2 + 'rem' }
+      },
+      computedYear (year) {
+        return format(year, 'MMM D, YYYY')
+      }
     }
-  },
-  attached () {
+  ),
+  mounted () {
     this.$nextTick(() => {
       this.setHeaderHeight(this.$el.offsetHeight)
     })
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

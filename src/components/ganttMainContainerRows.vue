@@ -1,27 +1,20 @@
 <template>
   <div class="gantt-main-container-rows">
-    <div class="row"
+    <div class="gantt-row"
       v-for="row in rows"
-      v-show="row.display"
-      track-by="$index"></div>
+      v-show="row.display"></div>
   </div>
 </template>
 
 <script>
-import moment from 'moment'
-import {
-  getTableTree,
-  getToggledTableTreeRow
-} from '../vuex/getters'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ganttMainContainerRows',
-  vuex: {
-    getters: {
-      tableTree: getTableTree,
-      toggleRow: getToggledTableTreeRow
-    }
-  },
+  computed: mapGetters({
+    tableTree: 'getTableTree',
+    toggleRow: 'getToggledTableTreeRow'
+  }),
   created () {
     this.rows = []
     this.generateRowsFromTreeTable(this.tableTree)
@@ -43,20 +36,22 @@ export default {
       }
     },
     generateRowsFromTreeTable (data) {
-      data.forEach((row) => {
-        this.rows.push(Object.assign({}, row, {
-          display: true
-        }))
-        if (row.children && row.children.length > 0) {
-          this.generateRowsFromTreeTable(row.children)
-        }
-      })
+      if (Array.isArray(data)) {
+        data.forEach((row) => {
+          this.rows.push(Object.assign({}, row, {
+            display: true
+          }))
+          if (row.children && row.children.length > 0) {
+            this.generateRowsFromTreeTable(row.children)
+          }
+        })
+      }
     }
   },
   data () {
     return {
       rows: []
-    };
+    }
   },
   watch: {
     toggleRow (data) {
@@ -77,7 +72,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  .row {
+  .gantt-row {
     display: block;
     width: 100%;
     height: 2rem;

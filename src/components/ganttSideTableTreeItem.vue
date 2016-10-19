@@ -2,16 +2,16 @@
   <div class="tree-item-folder">
     <div class="tree-item">
       <span v-if="isFolder">
-        <i class="material-icons"
+        <i class="glyphicon glyphicon-chevron-down"
           @click="toggle(model)"
-          v-if="open">expand_more</i>
-        <i class="material-icons"
+          v-if="open"></i>
+        <i class="glyphicon glyphicon-chevron-right"
           @click="toggle(model)"
-          v-else="!open">chevron_right</i>
+          v-else="!open"></i>
       </span>
       <span v-else>
-        <i class="material-icons"
-          v-else="!open">bubble_chart</i>
+        <i class="glyphicon glyphicon-minus"
+          v-if="!open"></i>
       </span>
       <span class="tree-item-model-name"
         @click="toggleRow">{{ model.name }}</span>
@@ -20,30 +20,22 @@
       class="tree-item-folder"
       v-show="open" v-if="isFolder"
       v-for="model in model.children"
-      track-by="$index"
-      :model.sync="model">
+      :model="model">
     </gantt-side-table-tree-item>
   </div>
 </template>
 
 <script>
-import { toggleTableTreeRow } from '../vuex/actions'
-import { getGanttData } from '../vuex/getters'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'ganttSideTableTreeItem',
-  vuex: {
-    actions: {
-      toggleTableTreeRow
-    }
-  },
   props: {
     model: Object
   },
   data () {
     return {
-      open: true,
-      expand: 'expand_more'
+      open: true
     }
   },
   computed: {
@@ -52,18 +44,23 @@ export default {
         this.model.children.length
     }
   },
-  methods: {
-    toggle (model) {
-      this.open = !this.open
-      this.toggleTableTreeRow({
-        open: this.open,
-        model: model
-      })
-    },
-    toggleRow () {
-      // TODO
+  methods: Object.assign(
+    mapActions({
+      toggleTableTreeRow: 'toggleTableTreeRow'
+    }),
+    {
+      toggle (model) {
+        this.open = !this.open
+        this.toggleTableTreeRow({
+          open: this.open,
+          model: model
+        })
+      },
+      toggleRow () {
+        // TODO
+      }
     }
-  }
+  )
 }
 </script>
 

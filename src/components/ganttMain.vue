@@ -12,67 +12,71 @@
 </template>
 
 <script>
-import moment from 'moment'
+import {
+  // parse,
+  min,
+  max,
+  isBefore,
+  format,
+  addMonths,
+  addWeeks,
+  addDays,
+  getISOWeeksInYear,
+  startOfMonth,
+  endOfWeek
+} from 'date-fns'
+
 import ganttMainHeader from './ganttMainHeader'
 import ganttMainContainer from './ganttMainContainer'
-import { getGanttData } from '../vuex/getters'
+import { mapGetters } from 'vuex'
 
-let startFrom = moment()
-let endTo = moment()
+let startFrom = new Date()
+let endTo = new Date()
 
 export default {
   name: 'ganttMain',
-  vuex: {
-    getters: {
-      data: getGanttData
-    }
-  },
+  computed: mapGetters({
+    ganttData: 'getGanttData'
+  }),
   components: {
-    ganttMainHeader,
-    ganttMainContainer
+    'gantt-main-header': ganttMainHeader,
+    'gantt-main-container': ganttMainContainer
   },
   created () {
-    let startFrom, endTo
-    this.data.forEach((data) => {
-      if (data.tasks
-        && data.tasks.length > 0)
-      {
+    this.ganttData.forEach((data) => {
+      if (data.tasks &&
+        data.tasks.length > 0
+      ) {
         data.tasks.forEach((task) => {
-          startFrom = moment.min(startFrom, task.from.clone())
-          endTo = moment.max(endTo, task.to.clone())
+          startFrom = min(startFrom, task.from)
+          endTo = max(endTo, task.to)
         })
       }
     })
 
-    startFrom = startFrom.startOf('month')
-    endTo = endTo.endOf('week')
+    startFrom = startOfMonth(startFrom)
+    endTo = endOfWeek(endTo)
 
     this.yearMonth = []
-    let startOfDate = startFrom.clone()
-    while (startOfDate.format('X') < endTo.format('X')) {
+    let startOfDate = startOfMonth(startFrom)
+    while (isBefore(startOfDate, endTo)) {
       this.yearMonth.push(startOfDate)
-      startOfDate = startOfDate.clone().add(1, 'month')
+      startOfDate = addMonths(startOfDate, 1)
     }
     this.yearWeeks = []
-    startOfDate = startFrom.clone()
-    while (startOfDate.format('X') < endTo.format('X')) {
-      this.yearWeeks.push(startOfDate.week())
-      startOfDate = startOfDate.clone().add(1, 'week')
+    startOfDate = startOfMonth(startFrom)
+    while (isBefore(startOfDate, endTo)) {
+      this.yearWeeks.push(getISOWeeksInYear(startOfDate))
+      startOfDate = addWeeks(startOfDate, 1)
     }
-
     this.yearDays = []
-    startOfDate = startFrom.clone();
-    while (startOfDate.format('X') < endTo.format('X')) {
-      this.yearDays.push(startOfDate.format('D'))
-      startOfDate = startOfDate.clone().add(1, 'day')
+    startOfDate = startOfMonth(startFrom)
+    while (isBefore(startOfDate, endTo)) {
+      this.yearDays.push(format(startOfDate, 'D'))
+      startOfDate = addDays(startOfDate, 1)
     }
 
     this.mainStyle.width = this.yearDays.length * 2 + 'rem'
-  },
-  props: {
-    data: {
-      type: Array
-    }
   },
   data () {
     return {
@@ -82,7 +86,7 @@ export default {
       yearMonth: [],
       yearWeeks: [],
       yearDays: []
-    };
+    }
   },
   watch: {
     height (height) {

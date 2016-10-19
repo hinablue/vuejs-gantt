@@ -1,34 +1,31 @@
 <template>
   <div class="gantt-main-container-tasks">
-    <div class="row"
+    <div class="gantt-row"
       v-for="row in rows"
-      v-show="row.display"
-      track-by="$index">
-      <div class="task"
+      v-show="row.display">
+      <div class="gantt-task"
         :style="setTaskStyles(task)"
-        v-for="task in row.tasks"
-        track-by="$index">{{ task.name }}</div>
+        v-for="task in row.tasks">{{ task.name }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import moment from 'moment'
+import { mapGetters } from 'vuex'
 import {
-  getGanttData,
-  getTableTree,
-  getToggledTableTreeRow
-} from '../vuex/getters'
+  format,
+  min,
+  startOfDay,
+  addYears
+} from 'date-fns'
 
 export default {
   name: 'ganttMainContainerTasks',
-  vuex: {
-    getters: {
-      data: getGanttData,
-      tableTree: getTableTree,
-      toggleRow: getToggledTableTreeRow
-    }
-  },
+  computed: mapGetters({
+    ganttData: 'getGanttData',
+    tableTree: 'getTableTree',
+    toggleRow: 'getToggledTableTreeRow'
+  }),
   created () {
     this.rows = []
     this.generateRowsFromTreeTable(this.tableTree)
@@ -36,17 +33,17 @@ export default {
   methods: {
     generateRowsFromTreeTable (data) {
       data.forEach((row) => {
-        let __index = this.data.findIndex((__row) => {
+        let __index = this.ganttData.findIndex((__row) => {
           return __row.id === row.id
         })
 
         if (__index > -1) {
           this.rows.push(Object.assign({}, row, {
             display: true,
-            tasks: this.data[__index].tasks.map((task) => {
-              this.startFrom = moment.min(this.startFrom, task.from.clone().startOf('day'))
+            tasks: this.ganttData[__index].tasks.map((task) => {
+              this.startFrom = min(this.startFrom, startOfDay(task.from))
               return Object.assign({}, task, {
-                color: task.color ? task.color : 'rgb(255, 150, 95)'
+                color: task.color ? task.color : 'rgba(255, 150, 95, 0.75)'
               })
             })
           }))
@@ -69,28 +66,28 @@ export default {
       return {
         left: this.getPositionFromDate(task.from) + 'px',
         width: this.getWidthFromDate(task.from, task.to) + 'px',
-        backgroundColor: task.color ? task.color : 'rgb(255, 150, 95)'
+        backgroundColor: task.color ? task.color : 'rgba(255, 150, 95, 0.75)'
       }
     },
     getPositionFromDate (date) {
       return Math.round(
-        (date.format('X') - this.startFrom.format('X')) / 3600 * (2 * 16 / 24)
+        (format(date, 'X') - format(this.startFrom, 'X')) / 3600 * (2 * 16 / 24)
       )
     },
     getWidthFromDate (from, to) {
       return Math.round(
         Math.abs(
-          Math.ceil((from.format('X') - to.format('X')) / 3600) * (2 * 16 / 24)
+          Math.ceil((format(from, 'X') - format(to, 'X')) / 3600) * (2 * 16 / 24)
         )
       )
     }
   },
   data () {
     return {
-      startFrom: moment().add(9999, 'year'),
+      startFrom: addYears(new Date(), 999),
       rows: [],
       loggedEvent: ''
-    };
+    }
   },
   watch: {
     tableTree (data) {
@@ -103,9 +100,9 @@ export default {
 
       this.$nextTick(() => {
         this.rows.forEach((row) => {
-          if (toggleRows.indexOf(row.id) > -1
-            && row.display !== !!data.open)
-          {
+          if (toggleRows.indexOf(row.id) > -1 &&
+            row.display !== !!data.open
+          ) {
             row.display = !!data.open
           }
         })
@@ -122,19 +119,19 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  .row {
+  .gantt-row {
     position: relative;
     top: 0;
     left: 0;
     width: 100%;
     height: 2rem;
     overflow: hidden;
-    .task {
+    .gantt-task {
       position: absolute;
-      top: 1px;
+      top: 0;
       left: 0;
       padding: 0.3rem 0;
-      background-color: rgb(255, 150, 95);
+      background-color: rgba(255, 150, 95, 0.75);
       overflow: hidden;
     }
   }
